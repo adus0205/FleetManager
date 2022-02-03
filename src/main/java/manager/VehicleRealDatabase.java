@@ -9,9 +9,6 @@ import java.util.List;
 
 public class VehicleRealDatabase implements VehicleDatabase {
 
-    private final static String DB_USER = "adrian";
-    private final static String DB_PASSWORD = "asd123";
-    private final static String DB_URL = "jdbc:mysql://localhost:3306/vehiclemanager";
     private Connection connection;
 
     @Override
@@ -30,9 +27,8 @@ public class VehicleRealDatabase implements VehicleDatabase {
 
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             generatedKeys.next();
-            long id = generatedKeys.getLong(1);
 
-            return id;
+            return generatedKeys.getLong(1);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -171,7 +167,7 @@ public class VehicleRealDatabase implements VehicleDatabase {
 
     @Override
     public void addInsurance(Long id, Insurance insurance) {
-        PreparedStatement preparedStatement1 = null;
+        PreparedStatement preparedStatement1;
         try {
             preparedStatement1 = connection.prepareStatement("INSERT INTO insurance (startDate, expireDate, insuranceCompany, insuranceType, lastPriceOfInsurence, vehicle_id) VALUES (?,?,?,?,?,?)");
             preparedStatement1.setDate(1, Date.valueOf(insurance.getStartDate()));
@@ -189,7 +185,7 @@ public class VehicleRealDatabase implements VehicleDatabase {
 
     @Override
     public void addInspection(Long id, Inspection inspection) {
-        PreparedStatement preparedStatement2 = null;
+        PreparedStatement preparedStatement2 ;
         try {
             preparedStatement2 = connection.prepareStatement("INSERT INTO inspection (inspectionDate, endOfInspection, odometer,result, vehicle_id) VALUES (?,?,?,?,?)");
             preparedStatement2.setDate(1, Date.valueOf(inspection.getInspectionDate()));
@@ -205,7 +201,7 @@ public class VehicleRealDatabase implements VehicleDatabase {
     }
 
     public void addCostService(Long id, Cost cost) {
-        PreparedStatement preparedStatement3 = null;
+        PreparedStatement preparedStatement3 ;
         try {
             preparedStatement3 = connection.prepareStatement("INSERT INTO cost (type,name,price ,vehicle_id) VALUES (?,?,?,?)");
             preparedStatement3.setString(1, cost.getType().name());
@@ -220,9 +216,9 @@ public class VehicleRealDatabase implements VehicleDatabase {
 
     }
 
-    public VehicleRealDatabase() {
+    public VehicleRealDatabase(String baza,String login,String haslo) {
         try {
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            connection = DriverManager.getConnection(baza, login, haslo);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
 

@@ -10,10 +10,11 @@ public class VehicleManager {
 
     private VehicleDatabase vehicleDatabase;
 
-    public VehicleManager() {
-        VehicleDatabase vehicleRealDatabase = new VehicleRealDatabase();
+    public VehicleManager(String baza,String login,String haslo) {
+        VehicleDatabase vehicleRealDatabase = new VehicleRealDatabase(baza,login,haslo);
         if (vehicleRealDatabase.isConnected()) {
             this.vehicleDatabase = vehicleRealDatabase;
+
         } else {
             VehicleMemoryDatabase vehicleMemoryDatabase1 = loadVehicleBase();
             if (vehicleMemoryDatabase1 != null) {

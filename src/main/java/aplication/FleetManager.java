@@ -12,7 +12,15 @@ public class FleetManager {
     private VehicleManager vehicleManager;
 
     public FleetManager() {
-        this.vehicleManager = new VehicleManager();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Przed startem aplikacji podaj url do bazy danych");
+        String baza = scanner.nextLine();
+        System.out.println("Podaj login");
+        String login = scanner.nextLine();
+        System.out.println("Podaj hasło");
+        String haslo = scanner.nextLine();
+        this.vehicleManager = new VehicleManager(baza, login, haslo);
+
     }
 
     public void start() {

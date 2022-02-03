@@ -6,8 +6,8 @@ import java.util.List;
 public class Car extends Vehicle {
 
 
-    public Car(String brand, String model, String vin) {
-        super(brand, model, vin);
+    public Car(String brand, String model, String vin, int engineCapacity) {
+        super(brand, model, vin, engineCapacity);
     }
 
 
@@ -15,6 +15,7 @@ public class Car extends Vehicle {
         super(id, brand, model, vin, engineCapacity, power, productionYear, carMilage, insurances, inspections, costs);
     }
 
-
-
+    public Car() {
+        super();
+    }
 }

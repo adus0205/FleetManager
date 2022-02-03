@@ -1,6 +1,7 @@
 package model.vehicle;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Vehicle implements Serializable {
@@ -12,10 +13,10 @@ public abstract class Vehicle implements Serializable {
     private int engineCapacity;
     private int power;
     private int productionYear;
-    private int carMilage;
-    private List<Insurance> insurances;
-    private List<Inspection> inspections;
-    private List<Cost> costs;
+    private int carMilage; //
+    private List<Insurance> insurances = new ArrayList<>();//1:n
+    private List<Inspection> inspections = new ArrayList<>();//1:N
+    private List<Cost> costs = new ArrayList<>();// 1:N
 
     public Vehicle(Long id, String brand, String model, String vin, int engineCapacity, int power, int productionYear, int carMilage, List<Insurance> insurances, List<Inspection> inspections, List<Cost> costs) {
         this.id = id;
@@ -30,13 +31,43 @@ public abstract class Vehicle implements Serializable {
         this.inspections = inspections;
         this.costs = costs;
     }
-    // wzorzec builder ??
 
-    public Vehicle(String brand, String model, String vin) {
+
+    public Vehicle(String brand, String model, String vin, int engineCapacity) {
         this.brand = brand;
         this.model = model;
         this.vin = vin;
+        this.engineCapacity = engineCapacity;
     }
+
+    public Vehicle() {
+
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public void setVin(String vin) {
+        this.vin = vin;
+    }
+
+    public void setEngineCapacity(int engineCapacity) {
+        this.engineCapacity = engineCapacity;
+    }
+
+    public void setPower(int power) {
+        this.power = power;
+    }
+
+    public void setProductionYear(int productionYear) {
+        this.productionYear = productionYear;
+    }
+
 
     @Override
     public String toString() {
@@ -106,82 +137,6 @@ public abstract class Vehicle implements Serializable {
     public void setCarMilage(int carMilage) {
         this.carMilage = carMilage;
     }
-    //        public static VehicleBuilder builder(){
-//            return new VehicleBuilder();
-//        }
-//
-//         public static class VehicleBuilder {
-//
-//            private Long id;
-//            private String brand;
-//            private String model;
-//            private String vin;
-//            private int engineCapacity;
-//            private int power;
-//            private int productionYear;
-//            private int carMilage;
-//            private List<Insurance> insurances;
-//            private List<Inspection> inspections;
-//            private List<Cost> costs;
-//
-//            public VehicleBuilder id(Long id) {
-//                this.id = id;
-//                return this;
-//            }
-//
-//            public VehicleBuilder brand(String brand) {
-//                this.brand = brand;
-//                return this;
-//            }
-//
-//            public VehicleBuilder model(String model) {
-//                this.model = model;
-//                return this;
-//            }
-//
-//            public VehicleBuilder vin(String vin) {
-//                this.vin = vin;
-//                return this;
-//            }
-//
-//            public VehicleBuilder engineCapacity(int engineCapacity) {
-//                this.engineCapacity = engineCapacity;
-//                return this;
-//            }
-//
-//            public VehicleBuilder power(int power) {
-//                this.power = power;
-//                return this;
-//            }
-//
-//
-//             public VehicleBuilder productionYear(int productionYear) {
-//                this.productionYear = productionYear;
-//                return this;
-//            }
-//
-//            public VehicleBuilder carMilage(int carMilage) {
-//                this.carMilage = carMilage;
-//                return this;
-//            }
-//
-//            public VehicleBuilder insurences(List insurances) {
-//                this.insurances = insurances;
-//                return this;
-//            }
-//
-//            public VehicleBuilder inspections(List inspections) {
-//                this.inspections = inspections;
-//                return this;
-//            }
-//
-//            public VehicleBuilder costs(List costs) {
-//                this.costs = costs;
-//                return this;
-//            }
 
-    //public Vehicle build(){
-    //return new Vehicle(id,brand,model,vin,engineCapacity,power,productionYear,carMilage,insurances,inspections,costs);
-    //}
 }
 

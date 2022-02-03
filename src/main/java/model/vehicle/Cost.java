@@ -4,14 +4,18 @@ import java.io.Serializable;
 
 public class Cost implements Serializable {
 
+    private Long id;
+    private CostType type;
     private String name;
     private double price;
-    private CostType type;
 
-    public Cost(String name, double price, CostType type) {
+
+    public Cost(Long id, CostType type,String name, double price) {
+        this.id = id;
+        this.type = type;
         this.name = name;
         this.price = price;
-        this.type = type;
+
     }
 
     public String getName() {

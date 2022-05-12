@@ -1,9 +1,6 @@
-package manager;
+package vehicle.manager;
 
-import model.vehicle.Cost;
-import model.vehicle.Inspection;
-import model.vehicle.Insurance;
-import model.vehicle.Vehicle;
+import vehicle.model.Vehicle;
 
 import java.util.List;
 
@@ -22,11 +19,5 @@ public interface VehicleDatabase {
     Vehicle findVehicleByVin(String vin);
 
     boolean isConnected();
-
-    void addInsurance(Long id, Insurance insurance);
-
-    void addInspection(Long id , Inspection inspection);
-
-    void addCostService(Long id, Cost cost);
 
 }

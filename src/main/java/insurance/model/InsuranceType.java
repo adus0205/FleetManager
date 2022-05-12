@@ -1,4 +1,4 @@
-package model.vehicle;
+package insurance.model;
 
 import java.io.Serializable;
 

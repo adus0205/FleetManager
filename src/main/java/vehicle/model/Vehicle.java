@@ -1,4 +1,8 @@
-package model.vehicle;
+package vehicle.model;
+
+import cost.model.Cost;
+import inspection.model.Inspection;
+import insurance.model.Insurance;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,19 +11,21 @@ import java.util.List;
 public abstract class Vehicle implements Serializable {
 
     private Long id;
+    private VehicleType type;
     private String brand;
     private String model;
     private String vin;
     private int engineCapacity;
     private int power;
     private int productionYear;
-    private int carMilage; //
+    private int carMilage;
     private List<Insurance> insurances = new ArrayList<>();//1:n
     private List<Inspection> inspections = new ArrayList<>();//1:N
     private List<Cost> costs = new ArrayList<>();// 1:N
 
-    public Vehicle(Long id, String brand, String model, String vin, int engineCapacity, int power, int productionYear, int carMilage, List<Insurance> insurances, List<Inspection> inspections, List<Cost> costs) {
+    public Vehicle(Long id,VehicleType type, String brand, String model, String vin, int engineCapacity, int power, int productionYear, int carMilage, List<Insurance> insurances, List<Inspection> inspections, List<Cost> costs) {
         this.id = id;
+        this.type = type;
         this.brand = brand;
         this.model = model;
         this.vin = vin;
@@ -32,16 +38,16 @@ public abstract class Vehicle implements Serializable {
         this.costs = costs;
     }
 
-
-    public Vehicle(String brand, String model, String vin, int engineCapacity) {
+    public Vehicle(VehicleType type,String brand, String model, String vin, int engineCapacity) {
+        this.type = type;
         this.brand = brand;
         this.model = model;
         this.vin = vin;
         this.engineCapacity = engineCapacity;
     }
 
-    public Vehicle() {
-
+    public Vehicle(VehicleType type) {
+        this.type = type;
     }
 
     public void setBrand(String brand) {
@@ -67,6 +73,16 @@ public abstract class Vehicle implements Serializable {
     public void setProductionYear(int productionYear) {
         this.productionYear = productionYear;
     }
+
+    public VehicleType getType() {
+        return type;
+    }
+
+    public void setType(VehicleType type) {
+        this.type = type;
+    }
+
+
 
 
     @Override

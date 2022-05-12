@@ -1,4 +1,4 @@
-package model.vehicle;
+package cost.model;
 
 import java.io.Serializable;
 

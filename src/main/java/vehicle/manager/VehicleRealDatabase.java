@@ -1,6 +1,10 @@
-package manager;
+package vehicle.manager;
 
-import model.vehicle.*;
+import app.database.DBConnection;
+import vehicle.model.Car;
+import vehicle.model.Motorcycle;
+import vehicle.model.Vehicle;
+import vehicle.model.VehicleType;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,19 +13,20 @@ import java.util.List;
 
 public class VehicleRealDatabase implements VehicleDatabase {
 
-    private Connection connection;
+    private final DBConnection connection;
 
     @Override
     public Long addVehicle(Vehicle vehicle) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO vehicle (brand,model,vin,engineCapacity,power,productionYear,carMilage) VALUES (?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, vehicle.getBrand());
-            preparedStatement.setString(2, vehicle.getModel());
-            preparedStatement.setString(3, vehicle.getVin());
-            preparedStatement.setInt(4, vehicle.getEngineCapacity());
-            preparedStatement.setInt(5, vehicle.getPower());
-            preparedStatement.setInt(6, vehicle.getProductionYear());
-            preparedStatement.setInt(7, vehicle.getCarMilage());
+            PreparedStatement preparedStatement = connection.prepareStatementWithKeys("INSERT INTO vehicle (type,brand,model,vin,engineCapacity,power,productionYear,carMilage) VALUES (?,?,?,?,?,?,?,?)");
+            preparedStatement.setString(1,vehicle.getType().name());
+            preparedStatement.setString(2, vehicle.getBrand());
+            preparedStatement.setString(3, vehicle.getModel());
+            preparedStatement.setString(4, vehicle.getVin());
+            preparedStatement.setInt(5, vehicle.getEngineCapacity());
+            preparedStatement.setInt(6, vehicle.getPower());
+            preparedStatement.setInt(7, vehicle.getProductionYear());
+            preparedStatement.setInt(8, vehicle.getCarMilage());
 
             preparedStatement.executeUpdate();
 
@@ -45,31 +50,38 @@ public class VehicleRealDatabase implements VehicleDatabase {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
     }
 
     @Override
     public Vehicle findVehicleById(Long id) {
+
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * from vehicle where id = ?");
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
-                throw new RuntimeException();
+                throw new RuntimeException("Wystapil blad przy pobieraniu z bazy");
             }
-            Vehicle car = new Car();
-            car.setId(resultSet.getLong("id"));
-            car.setBrand(resultSet.getString("brand"));
-            car.setModel(resultSet.getString("model"));
-            car.setVin(resultSet.getString("vin"));
-            car.setEngineCapacity(resultSet.getInt("engineCapacity"));
-            car.setPower(resultSet.getInt("power"));
-            car.setProductionYear(resultSet.getInt("productionYear"));
-            car.setCarMilage(resultSet.getInt("carMilage"));
+            VehicleType type = VehicleType.valueOf(resultSet.getString("type"));
+            Vehicle vehicle ;
+            if (type == VehicleType.CAR){
+                vehicle = new Car();
+            }else {
+                vehicle = new Motorcycle();
+            }
+            // przerobic zeby nie mozna dodac takiego typu pojazdu
+            // utworzyc w bazie kolumne type
+            vehicle.setId(resultSet.getLong("id"));
+            vehicle.setBrand(resultSet.getString("brand"));
+            vehicle.setModel(resultSet.getString("model"));
+            vehicle.setVin(resultSet.getString("vin"));
+            vehicle.setEngineCapacity(resultSet.getInt("engineCapacity"));
+            vehicle.setPower(resultSet.getInt("power"));
+            vehicle.setProductionYear(resultSet.getInt("productionYear"));
+            vehicle.setCarMilage(resultSet.getInt("carMilage"));
 
-            return car;
-
+            return vehicle;
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -122,7 +134,6 @@ public class VehicleRealDatabase implements VehicleDatabase {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
         return Collections.emptyList();
     }
 
@@ -146,8 +157,8 @@ public class VehicleRealDatabase implements VehicleDatabase {
             car.setProductionYear(resultSet.getInt("productionYear"));
             car.setCarMilage(resultSet.getInt("carMilage"));
 
-
             return car;
+            //przerobic zeby mozna bylo pobrac car i motocykl
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -157,80 +168,11 @@ public class VehicleRealDatabase implements VehicleDatabase {
 
     @Override
     public boolean isConnected() {
-        try {
-            return connection.isValid(1000);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        return false;
+        return connection.isConnected();
     }
 
-    @Override
-    public void addInsurance(Long id, Insurance insurance) {
-        PreparedStatement preparedStatement1;
-        try {
-            preparedStatement1 = connection.prepareStatement("INSERT INTO insurance (startDate, expireDate, insuranceCompany, insuranceType, lastPriceOfInsurence, vehicle_id) VALUES (?,?,?,?,?,?)");
-            preparedStatement1.setDate(1, Date.valueOf(insurance.getStartDate()));
-            preparedStatement1.setDate(2, Date.valueOf(insurance.getExpireDate()));
-            preparedStatement1.setString(3, insurance.getInsuranceCompany());
-            preparedStatement1.setString(4, insurance.getInsuranceType().name());
-            preparedStatement1.setInt(5, insurance.getLastPriceOfInsurence());
-            preparedStatement1.setLong(6, id);
-
-            preparedStatement1.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public VehicleRealDatabase(DBConnection dbConnection) {
+        this.connection = dbConnection;
     }
 
-    @Override
-    public void addInspection(Long id, Inspection inspection) {
-        PreparedStatement preparedStatement2 ;
-        try {
-            preparedStatement2 = connection.prepareStatement("INSERT INTO inspection (inspectionDate, endOfInspection, odometer,result, vehicle_id) VALUES (?,?,?,?,?)");
-            preparedStatement2.setDate(1, Date.valueOf(inspection.getInspectionDate()));
-            preparedStatement2.setDate(2, Date.valueOf(inspection.getEndOfInspection()));
-            preparedStatement2.setInt(3, inspection.getOdometer());
-            preparedStatement2.setBoolean(4, inspection.isResult());
-            preparedStatement2.setLong(5, id);
-
-            preparedStatement2.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    public void addCostService(Long id, Cost cost) {
-        PreparedStatement preparedStatement3 ;
-        try {
-            preparedStatement3 = connection.prepareStatement("INSERT INTO cost (type,name,price ,vehicle_id) VALUES (?,?,?,?)");
-            preparedStatement3.setString(1, cost.getType().name());
-            preparedStatement3.setString(2, cost.getName());
-            preparedStatement3.setDouble(3, cost.getPrice());
-            preparedStatement3.setLong(4, id);
-
-            preparedStatement3.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-    }
-
-    public VehicleRealDatabase(String baza,String login,String haslo) {
-        try {
-            connection = DriverManager.getConnection(baza, login, haslo);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-
-        }
-    }
-
-    public void closeDatabase() {
-        try {
-            connection.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-
-    }
 }

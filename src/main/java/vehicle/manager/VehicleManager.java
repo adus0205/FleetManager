@@ -1,6 +1,11 @@
-package manager;
+package vehicle.manager;
 
-import model.vehicle.*;
+import app.database.DBConnection;
+import cost.model.Cost;
+import inspection.model.Inspection;
+import insurance.model.Insurance;
+import vehicle.model.Car;
+import vehicle.model.Vehicle;
 
 import java.io.*;
 import java.util.List;
@@ -10,18 +15,11 @@ public class VehicleManager {
 
     private VehicleDatabase vehicleDatabase;
 
-    public VehicleManager(String baza,String login,String haslo) {
-        VehicleDatabase vehicleRealDatabase = new VehicleRealDatabase(baza,login,haslo);
+    public VehicleManager(DBConnection dbConnection) {
+
+        VehicleDatabase vehicleRealDatabase = new VehicleRealDatabase(dbConnection);
         if (vehicleRealDatabase.isConnected()) {
             this.vehicleDatabase = vehicleRealDatabase;
-
-        } else {
-            VehicleMemoryDatabase vehicleMemoryDatabase1 = loadVehicleBase();
-            if (vehicleMemoryDatabase1 != null) {
-                this.vehicleDatabase = vehicleMemoryDatabase1;
-            } else {
-                this.vehicleDatabase = new VehicleMemoryDatabase();
-            }
         }
     }
 
@@ -42,7 +40,6 @@ public class VehicleManager {
 
     }
 
-    //metoda zwracajaca sume kosztow dla danego pojazdu , pojad po id
     public Double costSum(Long id) {
         Vehicle vehicle = findById(id);
         double costs = 0.0;
@@ -54,24 +51,11 @@ public class VehicleManager {
 
     }
 
-    public void addInsurance(Long id, Insurance insurance) {
-        vehicleDatabase.addInsurance(id, insurance);
-    }
-
-    public void addInspection(Long id, Inspection inspection) {
-        vehicleDatabase.addInspection(id, inspection);
-    }
-
-    public void addCost(Long id, Cost cost) {
-        vehicleDatabase.addCostService(id, cost);
-    }
-
     public void deleteVehicle(Long id) {
         vehicleDatabase.removeVehicle(id);
     }
 
     public List<Vehicle> getAllVehicles() {
-
         return vehicleDatabase.getAllVehicles();
     }
 
@@ -80,10 +64,9 @@ public class VehicleManager {
 
         Vehicle vehicleByVin = vehicleDatabase.findVehicleByVin(vin);
         if (vehicleByVin == null) {
-            throw new NoSuchElementException("not found this vehicle " + vin);
+            throw new NoSuchElementException("Nie znaleziono pojazdu o podanym numerze vin " + " Podany nr vin to: " + vin);
         }
         return vehicleByVin;
-
     }
 
     public void saveVehicleBase() {
@@ -91,24 +74,8 @@ public class VehicleManager {
             outputStream.writeObject(vehicleDatabase);
 
         } catch (IOException e) {
-            System.out.println("zapis do pliku nie powiódł się ");
+            System.out.println("Zapis do pliku nie powiódł się ");
         }
     }
-
-    public VehicleMemoryDatabase loadVehicleBase() {
-        VehicleMemoryDatabase loadedVehicleMemoryDatabase = null;
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("vehiclebase.bin"))) {
-            loadedVehicleMemoryDatabase = (VehicleMemoryDatabase) inputStream.readObject();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return loadedVehicleMemoryDatabase;
-
-    }
-
 }
+

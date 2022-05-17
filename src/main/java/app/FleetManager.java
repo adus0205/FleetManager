@@ -12,6 +12,7 @@ import insurance.model.Insurance;
 import insurance.model.InsuranceType;
 import vehicle.manager.VehicleManager;
 import vehicle.model.Vehicle;
+import vehicle.model.VehicleType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -70,14 +71,18 @@ public class FleetManager {
                     break;
 
                 case 3:
-                    out.println("1.Podaj markę");
+                    out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
+                    int vehicletype = scanner.nextInt();
+                    VehicleType vehicleType = VehicleType.mapInToVehicleType(vehicletype);
+                    // dodane
+                    out.println("2.Podaj markę");
                     scanner.nextLine();
                     String brand = scanner.nextLine();
-                    out.println("2.Podaj model");
+                    out.println("3.Podaj model");
                     String model = scanner.nextLine();
-                    out.println("3.Podaj vin");
+                    out.println("4.Podaj vin");
                     String vin2 = scanner.nextLine();
-                    out.println("4.Podaj pojemność silnika");
+                    out.println("5.Podaj pojemność silnika");
                     int enginecapacity2 = scanner.nextInt();
                     addCar(brand, model, vin2, enginecapacity2);
                     printMenu();
@@ -109,11 +114,17 @@ public class FleetManager {
         out.println("Witamy w programie Fleet Manager");
         out.println("Co chcesz zrobic ? ");
         out.println("1.Wypisz zasoby floty");
-        out.println("2.Znajdź auto po nr vin");
+        out.println("2.Znajdź pojazd po nr vin");
         out.println("3.Dodaj nowy pojazd");
-        out.println("4. Usuń auto ");
+        out.println("4. Usuń pojazd ");
         out.println("5. Modyfikuj pojazd");
         out.println("0. Exit ");
+    }
+
+    private void chosenVehicleType(Scanner scanner, Vehicle vehicle){
+        out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
+        int vehicletype = scanner.nextInt();
+        VehicleType vehicleType = VehicleType.mapInToVehicleType(vehicletype);
     }
 
     // dodac menu wyboru typu pojazdu
@@ -134,7 +145,6 @@ public class FleetManager {
         }
     }
 
-
     private void findByVin(String vin) {
         if(vehicleManager.findByVin(vin) == null){
             out.println("Nie ma pojazdu o podanym nr vin." + " " + "Podany nr vin to : " + vin);
@@ -149,7 +159,12 @@ public class FleetManager {
         Long id = vehicleManager.addNewCar(brand, model, vin, engineCapacity);
         out.println("Dodano auto i wygenerowano Id pojazdu = " + id);
 
-    }// dodac metode dodajaca motocykle
+    }
+
+    private void addMotorcycle(String brand, String model, String vin, int engineCapacity){
+        Long id = vehicleManager.addNewCar(brand, model, vin, engineCapacity);
+        out.println("Dodano motocykl i wygenerowano Id pojazdu = " + id);
+    }                                                                      // dodana metoda
 
     private void deleteCar(int id) {
         vehicleManager.deleteVehicle((long) id);

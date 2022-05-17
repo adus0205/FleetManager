@@ -2,10 +2,9 @@ package vehicle.manager;
 
 import app.database.DBConnection;
 import cost.model.Cost;
-import inspection.model.Inspection;
-import insurance.model.Insurance;
 import vehicle.model.Car;
 import vehicle.model.Vehicle;
+import vehicle.model.VehicleType;
 
 import java.io.*;
 import java.util.List;

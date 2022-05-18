@@ -36,7 +36,6 @@ public class VehicleManager {
             throw new NoSuchElementException("not found this vehicle " + id);
         }
         return vehicleById;
-
     }
 
     public Double costSum(Long id) {

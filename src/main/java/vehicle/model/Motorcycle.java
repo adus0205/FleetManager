@@ -1,6 +1,5 @@
 package vehicle.model;
 
-
 import cost.model.Cost;
 import inspection.model.Inspection;
 import insurance.model.Insurance;

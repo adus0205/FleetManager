@@ -41,6 +41,18 @@ public class FleetManager {
         this.inspectionManager = new InspectionManager(dbConnection);
         this.insuranceManager = new InsuranceManager(dbConnection);
         this.costManager = new CostManager(dbConnection);
+
+    }
+
+    private void printMenu() {
+        out.println("Witamy w programie Fleet Manager");
+        out.println("Co chcesz zrobic ? ");
+        out.println("1.Wypisz zasoby floty");
+        out.println("2.Znajdź pojazd po nr vin");
+        out.println("3.Dodaj nowy pojazd");
+        out.println("4. Usuń pojazd ");
+        out.println("5. Modyfikuj pojazd");
+        out.println("0. Exit ");
     }
 
     public void start() {
@@ -55,13 +67,11 @@ public class FleetManager {
                 case 1:
                     printVehicles();
                     break;
-
                 case 0:
                     isRunning = false;
                     saveToDatabase();
                     out.println("***Zamykam aplikację***");
                     break;
-
                 case 2:
                     out.println("Podaj nr VIN pojazdu :");
                     scanner.nextLine();
@@ -69,7 +79,6 @@ public class FleetManager {
                     findByVin(vin);
                     printMenu();
                     break;
-
                 case 3:
                     out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
                     int vehicletype = scanner.nextInt();
@@ -87,7 +96,6 @@ public class FleetManager {
                     addCar(brand, model, vin2, enginecapacity2);
                     printMenu();
                     break;
-
                 case 4:
                     out.println("Podaj id pojazdu do usuniecia  :");
                     int i = scanner.nextInt();
@@ -95,14 +103,12 @@ public class FleetManager {
                     out.println("Usunieto pojazd o numerze id :" + i);
                     printMenu();
                     break;
-
                 case 5:
                     out.println("Podaj Id do modyfikacji pojazdu");
                     int i1 = scanner.nextInt();
                     modifyVehicle(scanner, i1);
                     printMenu();
                     break;
-
                 default:
                     break;
             }
@@ -110,24 +116,13 @@ public class FleetManager {
 
     }
 
-    private void printMenu() {
-        out.println("Witamy w programie Fleet Manager");
-        out.println("Co chcesz zrobic ? ");
-        out.println("1.Wypisz zasoby floty");
-        out.println("2.Znajdź pojazd po nr vin");
-        out.println("3.Dodaj nowy pojazd");
-        out.println("4. Usuń pojazd ");
-        out.println("5. Modyfikuj pojazd");
-        out.println("0. Exit ");
-    }
-
     private void chosenVehicleType(Scanner scanner, Vehicle vehicle){
         out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
         int vehicletype = scanner.nextInt();
         VehicleType vehicleType = VehicleType.mapInToVehicleType(vehicletype);
-    }
+    } // dodane menu wyboru typu
 
-    // dodac menu wyboru typu pojazdu
+
 
     private void printVehicles() {
         List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
@@ -224,7 +219,6 @@ public class FleetManager {
         Insurance insurance = new Insurance(null, parsedStartDate, parsedEndDate, insuranceCompany, insuranceType, insurancePrice);
         insuranceManager.addInsurance(vehicle.getId(), insurance);
     }
-
 
     private void addServiceCostToVehicle(Scanner scanner, Vehicle vehicle) {
         out.println("Podaj typ kosztu: 1.Serwis/naprawy 2.Przegląd");

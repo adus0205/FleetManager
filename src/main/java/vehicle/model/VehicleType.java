@@ -14,7 +14,6 @@ public enum VehicleType implements Serializable {
                 return MOTORCYCLE;
             default:
                 throw new IllegalArgumentException("Nie ma takiego typu pojazdu");
-
         }
 
     }

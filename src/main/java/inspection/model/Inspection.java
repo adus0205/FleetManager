@@ -11,7 +11,7 @@ public class Inspection implements Serializable {
     private int odometer;
     private boolean result;
 
-    public Inspection(Long id,LocalDate inspectionDate, LocalDate endOfInspection, int odometer, boolean result) {
+    public Inspection(Long id, LocalDate inspectionDate, LocalDate endOfInspection, int odometer, boolean result) {
         this.id = id;
         this.inspectionDate = inspectionDate;
         this.endOfInspection = endOfInspection;

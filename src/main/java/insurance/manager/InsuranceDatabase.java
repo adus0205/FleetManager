@@ -32,4 +32,15 @@ public class InsuranceDatabase {
         }
 
     }
+
+    public void removeInsurance(Long id) {
+        try {
+            PreparedStatement preparedStatement = dbConnection.prepareStatement("DELETE FROM insurance WHERE vehicle_id = ?");
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
 }

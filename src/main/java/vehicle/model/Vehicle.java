@@ -87,20 +87,10 @@ public abstract class Vehicle implements Serializable {
 
     @Override
     public String toString() {
-        return "Vehicle{" +
-                "id=" + id +
-                ", brand='" + brand + '\'' +
-                ", model='" + model + '\'' +
-                ", vin='" + vin + '\'' +
-                ", engineCapacity=" + engineCapacity +
-                ", power=" + power +
-                ", productionYear=" + productionYear +
-                ", carMilage=" + carMilage +
-                ", insurances=" + insurances +
-                ", inspections=" + inspections +
-                ", costs=" + costs +
-                '}';
+        return "Pojazd o podanym nr vin to : " +
+                 " Marka : " + brand.toUpperCase() + " ,Model: " + model.toUpperCase() + " ,Nr Vin: " + vin.toUpperCase() ;
     }
+
 
     public Long getId() {
         return id;

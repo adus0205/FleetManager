@@ -29,4 +29,8 @@ public class Cost implements Serializable {
     public CostType getType() {
         return type;
     }
+
+    public Long getId() {
+        return id;
+    }
 }

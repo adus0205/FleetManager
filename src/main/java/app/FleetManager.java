@@ -1,20 +1,15 @@
 package app;
 
 import app.database.DBConnection;
-import app.utils.ScannerUtils;
+
 import cost.manager.CostManager;
-import cost.model.Cost;
-import cost.model.CostType;
 import inspection.manager.InspectionManager;
-import inspection.model.Inspection;
 import insurance.manager.InsuranceManager;
-import insurance.model.Insurance;
-import insurance.model.InsuranceType;
+
 import vehicle.manager.VehicleManager;
 import vehicle.model.Vehicle;
 import vehicle.model.VehicleType;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -41,7 +36,6 @@ public class FleetManager {
         this.inspectionManager = new InspectionManager(dbConnection);
         this.insuranceManager = new InsuranceManager(dbConnection);
         this.costManager = new CostManager(dbConnection);
-
     }
 
     private void printMenu() {
@@ -69,7 +63,6 @@ public class FleetManager {
                     break;
                 case 0:
                     isRunning = false;
-                    saveToDatabase();
                     out.println("***Zamykam aplikację***");
                     break;
                 case 2:
@@ -80,10 +73,8 @@ public class FleetManager {
                     printMenu();
                     break;
                 case 3:
-                    out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
-                    int vehicletype = scanner.nextInt();
-                    VehicleType vehicleType = VehicleType.mapInToVehicleType(vehicletype);
-                    // dodane
+                    VehicleType vehicleType = chosenVehicleType(scanner);
+
                     out.println("2.Podaj markę");
                     scanner.nextLine();
                     String brand = scanner.nextLine();
@@ -93,7 +84,7 @@ public class FleetManager {
                     String vin2 = scanner.nextLine();
                     out.println("5.Podaj pojemność silnika");
                     int enginecapacity2 = scanner.nextInt();
-                    addCar(brand, model, vin2, enginecapacity2);
+                    addVehicle(vehicleType,brand, model, vin2, enginecapacity2);
                     printMenu();
                     break;
                 case 4:
@@ -116,13 +107,11 @@ public class FleetManager {
 
     }
 
-    private void chosenVehicleType(Scanner scanner, Vehicle vehicle){
+    private VehicleType chosenVehicleType(Scanner scanner){
         out.println("Podaj typ pojazdu, który chcesz dodać : 1. Auto  2.Motocykl");
         int vehicletype = scanner.nextInt();
-        VehicleType vehicleType = VehicleType.mapInToVehicleType(vehicletype);
-    } // dodane menu wyboru typu
-
-
+        return VehicleType.mapInToVehicleType(vehicletype);
+    }
 
     private void printVehicles() {
         List<Vehicle> allVehicles = vehicleManager.getAllVehicles();
@@ -134,8 +123,7 @@ public class FleetManager {
             out.println("Twoja lista aut:");
 
             for (Vehicle vehicle : allVehicles) {
-                out.println(vehicle.getId() + ". " + vehicle.getVin() + ", " + vehicle.getBrand() + ", " + vehicle.getModel() + ", " + vehicle.getEngineCapacity());
-
+                out.println(vehicle.getId() + ". "+ vehicle.getType()+ " " + vehicle.getVin() + ", " + vehicle.getBrand() + ", " + vehicle.getModel() + ", " + vehicle.getEngineCapacity());
             }
         }
     }
@@ -146,27 +134,33 @@ public class FleetManager {
         } else {
             out.println(vehicleManager.findByVin(vin));
         }
+    }
+
+    private void addVehicle(VehicleType type,String brand, String model, String vin, int engineCapacity) {
+        switch(type){
+            case CAR:
+                addCar(brand, model, vin, engineCapacity);
+            break;
+            case MOTORCYCLE:
+                addMotorcycle(brand, model, vin, engineCapacity);
+            default:
+                break;
+        }
 
     }
 
-    private void addCar(String brand, String model, String vin, int engineCapacity) {
-
+    private void addCar(String brand, String model, String vin, int engineCapacity){
         Long id = vehicleManager.addNewCar(brand, model, vin, engineCapacity);
         out.println("Dodano auto i wygenerowano Id pojazdu = " + id);
-
     }
 
     private void addMotorcycle(String brand, String model, String vin, int engineCapacity){
-        Long id = vehicleManager.addNewCar(brand, model, vin, engineCapacity);
+        Long id = vehicleManager.addNewMotorcycle(brand, model, vin, engineCapacity);
         out.println("Dodano motocykl i wygenerowano Id pojazdu = " + id);
-    }                                                                      // dodana metoda
+    }
 
     private void deleteCar(int id) {
         vehicleManager.deleteVehicle((long) id);
-    }
-
-    private void saveToDatabase() {
-        vehicleManager.saveVehicleBase();
     }
 
     private void modifyVehicle(Scanner scanner, int id) {
@@ -177,15 +171,18 @@ public class FleetManager {
         switch (choosenPosition) {
 
             case 1:
-                addInsuranceToCar(scanner, byId);
+                InsuranceMenu insuranceMenu = new InsuranceMenu(byId,scanner,insuranceManager);
+                insuranceMenu.handleInsurance();
                 break;
             case 0:
                 break;
             case 2:
-                addInspectionToCar(scanner, byId);
+                InspectionMenu inspectionMenu = new InspectionMenu(byId,scanner,inspectionManager);
+                inspectionMenu.handleInspection();
                 break;
             case 3:
-                addServiceCostToVehicle(scanner, byId);
+                CostMenu costMenu = new CostMenu(byId,scanner,costManager);
+                costMenu.handle();
                 break;
             default:
                 break;
@@ -195,60 +192,10 @@ public class FleetManager {
     private void printVehicleModyficationMenu(int id) {
         out.println("Modyfikujesz pojazd o id " + id);
         out.println("Co chcesz zrobic? ");
-        out.println("1. Dodaj ubezpieczenie");
-        out.println("2. Dodaj przegląd pojazdu");
-        out.println("3. Dodaj koszty serwisu");
+        out.println("1. Ubezpieczenie pojazdu");
+        out.println("2. Przegląd pojazdu");
+        out.println("3  Serwis pojazdu");
         out.println("0. Powrót ");
-    }
-
-    private void addInsuranceToCar(Scanner scanner, Vehicle vehicle) {
-        out.println("Podaj datę rozpoczęcia ubezpieczenia ");
-        scanner.nextLine();
-        LocalDate parsedStartDate = ScannerUtils.readDate(scanner);
-        out.println("Podaj datę zakończenia");
-        LocalDate parsedEndDate = ScannerUtils.readDate(scanner);
-        out.println("Podaj nazwę firmy ubezpieczeniowej ");
-        String insuranceCompany = scanner.nextLine();
-        out.println("Podaj typ ubezpieczenia : 1. Ac, 2.Oc, 3.AC-OC");
-        int typeOfInsurance = scanner.nextInt();
-        InsuranceType insuranceType = InsuranceType.mapIntToInsuranceType(typeOfInsurance);
-        out.println("Cena ubezpieczenia ");
-        int insurancePrice = scanner.nextInt();
-        out.println("Dodano ubezpieczenie do pojazdu");
-        menuSeparating();
-        Insurance insurance = new Insurance(null, parsedStartDate, parsedEndDate, insuranceCompany, insuranceType, insurancePrice);
-        insuranceManager.addInsurance(vehicle.getId(), insurance);
-    }
-
-    private void addServiceCostToVehicle(Scanner scanner, Vehicle vehicle) {
-        out.println("Podaj typ kosztu: 1.Serwis/naprawy 2.Przegląd");
-        int serviceType = scanner.nextInt();
-        CostType costType = CostType.mapIntToCostType(serviceType);
-        out.println("Podaj nazwę kosztu serwisu, który chcesz dodać np.opony : ");
-        scanner.nextLine();
-        String nameCost = scanner.nextLine();
-        out.println("Podaj cenę podanego kosztu");
-        double costPrice = scanner.nextDouble();
-        out.println("Dodano nowy koszt serwisowania pojazdu");
-        menuSeparating();
-        Cost cost = new Cost(null, costType, nameCost, costPrice);
-        costManager.addServiceCost(vehicle.getId(), cost);
-    }
-
-    private void addInspectionToCar(Scanner scanner, Vehicle vehicle) {
-        out.println("Podaj datę przeglądu");
-        scanner.nextLine();
-        LocalDate parseStartDate = ScannerUtils.readDate(scanner);
-        out.println("Podaj datę końca obowiązywania przeglądu pojazdu");
-        LocalDate parseEndDate = ScannerUtils.readDate(scanner);
-        out.println("Podaj przebieg pojazdu");
-        int odometerValue = scanner.nextInt();
-        out.println("Podaj wynik badania technicznego");
-        boolean inspectionResult = scanner.nextBoolean();
-        out.println("Inspekcja pojazdu została zaaktualizowana");
-        menuSeparating();
-        Inspection inspection = new Inspection(null, parseStartDate, parseEndDate, odometerValue, inspectionResult);
-        inspectionManager.addInspection(vehicle.getId(), inspection);
     }
 
     private void menuSeparating(){

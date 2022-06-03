@@ -8,8 +8,10 @@ import vehicle.model.VehicleType;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VehicleRealDatabase implements VehicleDatabase {
 
@@ -70,8 +72,7 @@ public class VehicleRealDatabase implements VehicleDatabase {
             }else {
                 vehicle = new Motorcycle();
             }
-            // przerobic zeby nie mozna dodac takiego typu pojazdu
-            // utworzyc w bazie kolumne type
+
             vehicle.setId(resultSet.getLong("id"));
             vehicle.setBrand(resultSet.getString("brand"));
             vehicle.setModel(resultSet.getString("model"));
@@ -118,16 +119,19 @@ public class VehicleRealDatabase implements VehicleDatabase {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Vehicle> vehicles = new ArrayList<>();
             while (resultSet.next()) {
-                Vehicle car = new Car();
-                car.setId(resultSet.getLong("id"));
-                car.setBrand(resultSet.getString("brand"));
-                car.setModel(resultSet.getString("model"));
-                car.setVin(resultSet.getString("vin"));
-                car.setEngineCapacity(resultSet.getInt("engineCapacity"));
-                car.setPower(resultSet.getInt("power"));
-                car.setProductionYear(resultSet.getInt("productionYear"));
-                car.setCarMilage(resultSet.getInt("carMilage"));
-                vehicles.add(car);
+                String type = resultSet.getString("type");
+
+                Vehicle vehicle = createVehicleByType( type);
+
+                vehicle.setId(resultSet.getLong("id"));
+                vehicle.setBrand(resultSet.getString("brand"));
+                vehicle.setModel(resultSet.getString("model"));
+                vehicle.setVin(resultSet.getString("vin"));
+                vehicle.setEngineCapacity(resultSet.getInt("engineCapacity"));
+                vehicle.setPower(resultSet.getInt("power"));
+                vehicle.setProductionYear(resultSet.getInt("productionYear"));
+                vehicle.setCarMilage(resultSet.getInt("carMilage"));
+                vehicles.add(vehicle);
             }
             return vehicles;
 
@@ -135,6 +139,24 @@ public class VehicleRealDatabase implements VehicleDatabase {
             throwables.printStackTrace();
         }
         return Collections.emptyList();
+    }
+
+    private Vehicle createVehicleByType( String type) {
+
+        if (type==null){
+            throw new IllegalArgumentException(" Wartość null w polu type " );
+        }
+        VehicleType vehicleType = VehicleType.valueOf(type);
+        Vehicle vehicle;
+
+        if (vehicleType == VehicleType.CAR){
+            vehicle = new Car();
+        }else if (vehicleType == VehicleType.MOTORCYCLE){
+            vehicle = new Motorcycle();
+        }else{
+            throw new IllegalArgumentException( " Pojazd powinien być jednym z tych typów: "+ Arrays.stream(VehicleType.values()).map(VehicleType::name).collect(Collectors.toList()));
+        }
+        return vehicle;
     }
 
     @Override
@@ -145,21 +167,18 @@ public class VehicleRealDatabase implements VehicleDatabase {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
-                throw new RuntimeException();
+                return null;
             }
-            Vehicle car = new Car();
-            car.setId(resultSet.getLong("id"));
-            car.setBrand(resultSet.getString("brand"));
-            car.setModel(resultSet.getString("model"));
-            car.setVin(resultSet.getString("vin"));
-            car.setEngineCapacity(resultSet.getInt("engineCapacity"));
-            car.setPower(resultSet.getInt("power"));
-            car.setProductionYear(resultSet.getInt("productionYear"));
-            car.setCarMilage(resultSet.getInt("carMilage"));
-
-            return car;
-            //przerobic zeby mozna bylo pobrac car i motocykl
-
+            Vehicle vehicle = createVehicleByType(resultSet.getString("type"));
+            vehicle.setId(resultSet.getLong("id"));
+            vehicle.setBrand(resultSet.getString("brand"));
+            vehicle.setModel(resultSet.getString("model"));
+            vehicle.setVin(resultSet.getString("vin"));
+            vehicle.setEngineCapacity(resultSet.getInt("engineCapacity"));
+            vehicle.setPower(resultSet.getInt("power"));
+            vehicle.setProductionYear(resultSet.getInt("productionYear"));
+            vehicle.setCarMilage(resultSet.getInt("carMilage"));
+            return vehicle;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

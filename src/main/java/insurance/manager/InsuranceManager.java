@@ -14,4 +14,8 @@ public class InsuranceManager {
     public void addInsurance(Long id, Insurance insurance){
         insuranceDatabase.addInsurance(id, insurance);
     }
+
+    public void deleteInsurance(Long id){
+        insuranceDatabase.removeInsurance(id);
+    }
 }

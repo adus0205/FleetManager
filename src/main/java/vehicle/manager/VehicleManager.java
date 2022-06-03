@@ -3,10 +3,9 @@ package vehicle.manager;
 import app.database.DBConnection;
 import cost.model.Cost;
 import vehicle.model.Car;
+import vehicle.model.Motorcycle;
 import vehicle.model.Vehicle;
-import vehicle.model.VehicleType;
 
-import java.io.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -15,7 +14,6 @@ public class VehicleManager {
     private VehicleDatabase vehicleDatabase;
 
     public VehicleManager(DBConnection dbConnection) {
-
         VehicleDatabase vehicleRealDatabase = new VehicleRealDatabase(dbConnection);
         if (vehicleRealDatabase.isConnected()) {
             this.vehicleDatabase = vehicleRealDatabase;
@@ -23,10 +21,8 @@ public class VehicleManager {
     }
 
     public Long addNewCar(String brand, String model, String vin, int engineCapacity) {
-
         Vehicle vehicle = new Car(brand, model, vin, engineCapacity);
-        long id = vehicleDatabase.addVehicle(vehicle);
-        return id;
+        return vehicleDatabase.addVehicle(vehicle);
     }
 
     public Vehicle findById(Long id) {
@@ -42,11 +38,10 @@ public class VehicleManager {
         Vehicle vehicle = findById(id);
         double costs = 0.0;
         List<Cost> costList = vehicle.getCosts();
-        for (int i = 0; i < costList.size(); i++) {
-            costs = costs + costList.get(i).getPrice();
+        for (Cost cost : costList) {
+            costs = costs + cost.getPrice();
         }
         return costs;
-
     }
 
     public void deleteVehicle(Long id) {
@@ -57,23 +52,13 @@ public class VehicleManager {
         return vehicleDatabase.getAllVehicles();
     }
 
-
     public Vehicle findByVin(String vin) {
-
-        Vehicle vehicleByVin = vehicleDatabase.findVehicleByVin(vin);
-        if (vehicleByVin == null) {
-            throw new NoSuchElementException("Nie znaleziono pojazdu o podanym numerze vin " + " Podany nr vin to: " + vin);
-        }
-        return vehicleByVin;
+        return vehicleDatabase.findVehicleByVin(vin);
     }
 
-    public void saveVehicleBase() {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("vehiclebase.bin"))) {
-            outputStream.writeObject(vehicleDatabase);
-
-        } catch (IOException e) {
-            System.out.println("Zapis do pliku nie powiódł się ");
-        }
+    public Long addNewMotorcycle(String brand, String model, String vin, int engineCapacity) {
+        Vehicle vehicle = new Motorcycle(brand, model, vin, engineCapacity);
+        return vehicleDatabase.addVehicle(vehicle);
     }
 }
 
